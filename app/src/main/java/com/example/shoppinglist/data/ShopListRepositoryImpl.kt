@@ -7,6 +7,7 @@ import com.example.shoppinglist.domain.ShopListRepository
 
 object ShopListRepositoryImpl : ShopListRepository {
     private val shopList = mutableListOf<ShopItem>()
+    private val shopListLD = MutableLiveData<List<ShopItem>>()
     private var autoIncrementId = 0
 
     init {
@@ -16,15 +17,21 @@ object ShopListRepositoryImpl : ShopListRepository {
         }
     }
 
+    private fun updateLiveData(){
+        shopListLD.value = shopList.toList()
+    }
+
     override fun addShopItem(shopItem: ShopItem) {
         if (shopItem.id == ShopItem.UNDEFINED_ID) {
             shopItem.id = autoIncrementId++
         }
         shopList.add(shopItem)
+        updateLiveData()
     }
 
     override fun deleteShopItem(shopItem: ShopItem) {
         shopList.remove(shopItem)
+        updateLiveData()
     }
 
     override fun editShopItem(shopItem: ShopItem) {
@@ -37,7 +44,7 @@ object ShopListRepositoryImpl : ShopListRepository {
         return shopList.find { it.id == shopItemId } ?: throw RuntimeException("shopItemId = null")
     }
 
-    override fun getShopList(): List<ShopItem> {
-        return shopList
+    override fun getShopList(): LiveData<List<ShopItem>> {
+        return shopListLD
     }
 }
