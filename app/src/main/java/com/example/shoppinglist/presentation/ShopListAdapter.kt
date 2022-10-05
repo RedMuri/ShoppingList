@@ -1,6 +1,5 @@
 package com.example.shoppinglist.presentation
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,9 @@ class ShopListAdapter : Adapter<ShopListAdapter.ShopItemViewHolder>() {
         const val MAX_POOL_SIZE = 10
     }
 
-    var count = 0
+    var onShopItemClickListener: ((ShopItem)->Unit)? = null
+    var onShopItemLongClickListener: ((ShopItem)->Unit)? = null
+
     var shopList = listOf<ShopItem>()
         set(value) {
             field = value
@@ -30,7 +31,6 @@ class ShopListAdapter : Adapter<ShopListAdapter.ShopItemViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
-        Log.i("muri", "onCreate: ${++count}")
         val layout = when(viewType){
             VIEW_TYPE_ENABLED -> R.layout.item_shop_enabled
             VIEW_TYPE_DISABLED -> R.layout.item_shop_disabled
@@ -45,6 +45,13 @@ class ShopListAdapter : Adapter<ShopListAdapter.ShopItemViewHolder>() {
         val item = shopList[position]
         holder.tvCount.text = item.count.toString()
         holder.tvName.text = item.name
+        holder.itemView.setOnClickListener{
+            onShopItemClickListener?.invoke(item)
+        }
+        holder.itemView.setOnLongClickListener{
+            onShopItemLongClickListener?.invoke(item)
+            true
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
