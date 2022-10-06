@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import com.example.shoppinglist.R
 import com.example.shoppinglist.domain.ShopItem
+import com.example.shoppinglist.presentation.view_models.ShopItemViewModel
 
 class ShopItemActivity : AppCompatActivity() {
+    private lateinit var shopItemViewModel: ShopItemViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
