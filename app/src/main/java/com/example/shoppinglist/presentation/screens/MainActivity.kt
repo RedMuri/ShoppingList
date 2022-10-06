@@ -1,4 +1,4 @@
-package com.example.shoppinglist.presentation
+package com.example.shoppinglist.presentation.screens
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
+import com.example.shoppinglist.presentation.view_models.MainViewModel
+import com.example.shoppinglist.presentation.adapters.ShopListAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,7 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupOnClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            Log.d("muri", it.toString())
+            val intent = ShopItemActivity.newIntent(this,it.id)
+            startActivity(intent)
         }
     }
 
