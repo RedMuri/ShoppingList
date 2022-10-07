@@ -30,6 +30,17 @@ class ShopItemFragment : Fragment() {
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
 
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        onEditingFinishedListener = if (context is OnEditingFinishedListener){
+            context
+        } else {
+            throw RuntimeException("Activity should implement OnEditingFinishedListener")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parseParams()
@@ -62,7 +73,7 @@ class ShopItemFragment : Fragment() {
 
     private fun observeViewModel() {
         shopItemViewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-            activity?.onBackPressed()
+            onEditingFinishedListener.onEditingFinish()
         }
         shopItemViewModel.errorInputName.observe(viewLifecycleOwner) {
             if (it) {
@@ -148,6 +159,10 @@ class ShopItemFragment : Fragment() {
         etName = view.findViewById(R.id.et_name)
         etCount = view.findViewById(R.id.et_count)
         buttonSave = view.findViewById(R.id.save_button)
+    }
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinish()
     }
 
     companion object {

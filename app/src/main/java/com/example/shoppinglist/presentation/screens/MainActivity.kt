@@ -13,7 +13,7 @@ import com.example.shoppinglist.presentation.view_models.MainViewModel
 import com.example.shoppinglist.presentation.adapters.ShopListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var buttonAddShopItem: FloatingActionButton
     private lateinit var viewModel: MainViewModel
@@ -105,5 +105,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    override fun onEditingFinish() {
+        supportFragmentManager.popBackStack()
     }
 }
