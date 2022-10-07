@@ -15,6 +15,5 @@ class MainActivity : AppCompatActivity() {
         viewModel.shopList.observe(this){
             Log.i("muri",it.toString())
         }
-        viewModel.getShopList()
     }
 }
