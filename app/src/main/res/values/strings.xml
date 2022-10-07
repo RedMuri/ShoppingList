@@ -4,4 +4,6 @@
     <string name="til_name_hint">Name:</string>
     <string name="til_count_hint">Count:</string>
     <string name="save_button_text">Save</string>
+    <string name="til_name_error">Error name</string>
+    <string name="til_count_error">Error count</string>
 </resources>
