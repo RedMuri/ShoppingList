@@ -58,7 +58,7 @@ class ShopItemFragment(
 
     private fun observeViewModel() {
         shopItemViewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-            activity?.finish()
+            activity?.onBackPressed()
         }
         shopItemViewModel.errorInputName.observe(viewLifecycleOwner) {
             if (it) {
@@ -122,7 +122,7 @@ class ShopItemFragment(
 
     private fun parseParams() {
         if (screenMode != MODE_ADD && screenMode != MODE_EDIT)
-            throw RuntimeException("Unknown screen mode!")
+            throw RuntimeException("Unknown screen mode: $screenMode")
         if (screenMode == MODE_EDIT && shopItemId == ShopItem.UNDEFINED_ID) {
             throw RuntimeException("Param shop item id is absent!")
         }
@@ -143,6 +143,14 @@ class ShopItemFragment(
         private const val EXTRA_SCREEN_MODE = "extra_screen_mode"
         private const val MODE_ADD = "mode_add"
         private const val MODE_EDIT = "mode_edit"
+
+        fun newInstanceAddItem(): Fragment{
+            return ShopItemFragment(MODE_ADD)
+        }
+
+        fun newInstanceEditItem(shopItemId: Int): Fragment{
+            return ShopItemFragment(MODE_EDIT,shopItemId)
+        }
 
         fun newIntentEditItem(context: Context, shopItemId: Int): Intent {
             val intent = Intent(context, ShopItemActivity::class.java)
