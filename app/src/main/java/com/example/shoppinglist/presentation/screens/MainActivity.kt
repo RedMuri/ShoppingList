@@ -109,5 +109,6 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
 
     override fun onEditingFinish() {
         supportFragmentManager.popBackStack()
+        val a = 8
     }
 }
