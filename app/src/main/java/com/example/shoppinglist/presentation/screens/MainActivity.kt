@@ -2,6 +2,7 @@ package com.example.shoppinglist.presentation.screens
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainer
 import androidx.fragment.app.FragmentContainerView
@@ -9,29 +10,28 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
+import com.example.shoppinglist.databinding.ActivityMainBinding
 import com.example.shoppinglist.presentation.view_models.MainViewModel
 import com.example.shoppinglist.presentation.adapters.ShopListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
-    private lateinit var buttonAddShopItem: FloatingActionButton
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var viewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
-    private lateinit var rvShopList: RecyclerView
-    private var shopItemContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        shopItemContainer = findViewById(R.id.shop_item_container)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupRecyclerView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
             shopListAdapter.submitList(it)
         }
-        buttonAddShopItem = findViewById(R.id.button_add_shop_item)
-        buttonAddShopItem.setOnClickListener { buttonAddShopItem() }
+        binding.buttonAddShopItem.setOnClickListener { buttonAddShopItem() }
     }
 
     private fun buttonAddShopItem() {
@@ -45,8 +45,7 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     }
 
     private fun setupRecyclerView() {
-        rvShopList = findViewById(R.id.rv_shop_list)
-        with(rvShopList) {
+        with(binding.rvShopList) {
             shopListAdapter = ShopListAdapter()
             adapter = shopListAdapter
             recycledViewPool.setMaxRecycledViews(ShopListAdapter.VIEW_TYPE_ENABLED,
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         }
         this.setupOnLongClickListener()
         this.setupOnClickListener()
-        setupSwipeListener(rvShopList)
+        setupSwipeListener(binding.rvShopList)
     }
 
     private fun setupOnLongClickListener() {
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         }
     }
 
-    private fun isOnePaneMode() = shopItemContainer == null
+    private fun isOnePaneMode() = binding.shopItemContainer == null
 
     private fun launchFragment(fragment: Fragment) {
         supportFragmentManager.popBackStack()
@@ -109,6 +108,5 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
 
     override fun onEditingFinish() {
         supportFragmentManager.popBackStack()
-        val a = 8
     }
 }
