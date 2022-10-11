@@ -17,7 +17,8 @@ abstract class AppDatabase : RoomDatabase() {
             synchronized(LOCK) {
                 INSTANCE?.let { return it }
                 val db =
-                    Room.databaseBuilder(application, AppDatabase::class.java, DB_NAME).build()
+                    Room.databaseBuilder(application, AppDatabase::class.java, DB_NAME)
+                        .build()
                 INSTANCE = db
                 return db
             }
