@@ -14,9 +14,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.shoppinglist.R
 import com.example.shoppinglist.databinding.FragmentShopItemBinding
 import com.example.shoppinglist.domain.ShopItem
+import com.example.shoppinglist.presentation.ShopListApp
 import com.example.shoppinglist.presentation.view_models.ShopItemViewModel
+import com.example.shoppinglist.presentation.view_models.ViewModelFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import javax.inject.Inject
 
 
 class ShopItemFragment : Fragment() {
@@ -24,7 +27,16 @@ class ShopItemFragment : Fragment() {
     private val binding: FragmentShopItemBinding
     get() = _binding ?: throw RuntimeException("FragmentShopItemBinding = null!")
 
-    private lateinit var shopItemViewModel: ShopItemViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val shopItemViewModel by lazy {
+        ViewModelProvider(this,viewModelFactory)[ShopItemViewModel::class.java]
+    }
+
+    private val component by lazy {
+        (requireActivity().application as ShopListApp).component
+    }
 
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
@@ -32,6 +44,7 @@ class ShopItemFragment : Fragment() {
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
         onEditingFinishedListener = if (context is OnEditingFinishedListener){
             context
@@ -56,7 +69,6 @@ class ShopItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        shopItemViewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         binding.viewModel = shopItemViewModel
         binding.lifecycleOwner = viewLifecycleOwner
         launchRightMode()
