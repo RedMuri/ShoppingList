@@ -1,7 +1,9 @@
 package com.example.shoppinglist.presentation.screens
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,18 +22,19 @@ import com.example.shoppinglist.presentation.view_models.ViewModelFactory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 
 class ShopItemFragment : Fragment() {
     private var _binding: FragmentShopItemBinding? = null
     private val binding: FragmentShopItemBinding
-    get() = _binding ?: throw RuntimeException("FragmentShopItemBinding = null!")
+        get() = _binding ?: throw RuntimeException("FragmentShopItemBinding = null!")
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
     private val shopItemViewModel by lazy {
-        ViewModelProvider(this,viewModelFactory)[ShopItemViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[ShopItemViewModel::class.java]
     }
 
     private val component by lazy {
@@ -46,7 +49,7 @@ class ShopItemFragment : Fragment() {
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
-        onEditingFinishedListener = if (context is OnEditingFinishedListener){
+        onEditingFinishedListener = if (context is OnEditingFinishedListener) {
             context
         } else {
             throw RuntimeException("Activity should implement OnEditingFinishedListener")
@@ -63,7 +66,7 @@ class ShopItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentShopItemBinding.inflate(inflater,container,false)
+        _binding = FragmentShopItemBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -122,7 +125,19 @@ class ShopItemFragment : Fragment() {
 
     private fun launchAddMode() {
         binding.saveButton.setOnClickListener {
-            shopItemViewModel.addShopItem(binding.etName.text?.toString(), binding.etCount.text?.toString())
+            //shopItemViewModel.addShopItem(binding.etName.text?.toString(), binding.etCount.text?.toString())
+            thread {
+                context?.contentResolver?.insert(
+                    Uri.parse("content://com.example.shoppinglist/shop_items"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("count", binding.etCount.text?.toString()?.toInt())
+                        put("name", binding.etName.text?.toString())
+                        put("enabled", true)
+                    }
+                )
+
+            }
         }
     }
 
