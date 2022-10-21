@@ -1,22 +1,24 @@
 package com.example.shoppinglist.presentation.screens
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.provider.ContactsContract.Contacts
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainer
-import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
 import com.example.shoppinglist.databinding.ActivityMainBinding
+import com.example.shoppinglist.presentation.Contact
 import com.example.shoppinglist.presentation.ShopListApp
-import com.example.shoppinglist.presentation.view_models.MainViewModel
 import com.example.shoppinglist.presentation.adapters.ShopListAdapter
+import com.example.shoppinglist.presentation.view_models.MainViewModel
 import com.example.shoppinglist.presentation.view_models.ViewModelFactory
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
@@ -26,7 +28,7 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
     lateinit var viewModelFactory: ViewModelFactory
 
     private val viewModel by lazy {
-        ViewModelProvider(this,viewModelFactory)[MainViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 
     private val component by lazy {
@@ -45,6 +47,59 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
             shopListAdapter.submitList(it)
         }
         binding.buttonAddShopItem.setOnClickListener { buttonAddShopItem() }
+
+        val permissionGranted = ActivityCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (permissionGranted)
+            requestContacts()
+        else
+            requestPermission()
+    }
+
+    private fun requestContacts() {
+        thread {
+            val cursor = contentResolver.query(
+                Contacts.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+            )
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(Contacts._ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(Contacts.DISPLAY_NAME))
+                val contact = Contact(id, name)
+                Log.d("muri", contact.toString())
+            }
+            cursor?.close()
+        }
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.READ_CONTACTS),
+            READ_CONTACTS_RC
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == READ_CONTACTS_RC && grantResults.isNotEmpty()){
+            val permissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
+
+            if (permissionGranted)
+                requestContacts()
+            else
+                Log.d("muri","denied final")
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun buttonAddShopItem() {
@@ -121,5 +176,9 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
 
     override fun onEditingFinish() {
         supportFragmentManager.popBackStack()
+    }
+
+    companion object {
+        private const val READ_CONTACTS_RC = 100
     }
 }
